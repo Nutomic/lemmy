@@ -20,7 +20,7 @@ impl PerformCrud for GetComments {
     let local_user_view = get_local_user_view_from_jwt_opt(&data.auth, context.pool()).await?;
     let person_id = local_user_view.map(|u| u.person.id);
 
-    let type_ = ListingType::from_str(&data.type_)?;
+    let listing_type = ListingType::from_str(&data.type_)?;
     let sort = SortType::from_str(&data.sort)?;
 
     let community_id = data.community_id;
@@ -30,7 +30,7 @@ impl PerformCrud for GetComments {
     let limit = data.limit;
     let comments = blocking(context.pool(), move |conn| {
       CommentQueryBuilder::create(conn)
-        .listing_type(type_)
+        .listing_type(&listing_type)
         .sort(&sort)
         .saved_only(saved_only)
         .community_id(community_id)
