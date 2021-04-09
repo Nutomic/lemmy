@@ -153,6 +153,8 @@ impl Perform for Search {
     let sort = SortType::from_str(&data.sort)?;
     let community_id = data.community_id;
     let community_name = data.community_name.to_owned();
+    let community_name_2 = data.community_name.to_owned();
+    let creator_id = data.creator_id;
     match type_ {
       SearchType::Posts => {
         posts = blocking(context.pool(), move |conn| {
@@ -161,6 +163,7 @@ impl Perform for Search {
             .show_nsfw(true)
             .community_id(community_id)
             .community_name(community_name)
+            .creator_id(creator_id)
             .my_person_id(person_id)
             .search_term(q)
             .page(page)
@@ -174,6 +177,9 @@ impl Perform for Search {
           CommentQueryBuilder::create(&conn)
             .sort(&sort)
             .search_term(q)
+            .community_id(community_id)
+            .community_name(community_name)
+            .creator_id(creator_id)
             .my_person_id(person_id)
             .page(page)
             .limit(limit)
@@ -211,6 +217,7 @@ impl Perform for Search {
             .show_nsfw(true)
             .community_id(community_id)
             .community_name(community_name)
+            .creator_id(creator_id)
             .my_person_id(person_id)
             .search_term(q)
             .page(page)
@@ -226,6 +233,9 @@ impl Perform for Search {
           CommentQueryBuilder::create(conn)
             .sort(&sort)
             .search_term(q)
+            .community_id(community_id)
+            .community_name(community_name_2)
+            .creator_id(creator_id)
             .my_person_id(person_id)
             .page(page)
             .limit(limit)
@@ -268,6 +278,7 @@ impl Perform for Search {
             .my_person_id(person_id)
             .community_id(community_id)
             .community_name(community_name)
+            .creator_id(creator_id)
             .url_search(q)
             .page(page)
             .limit(limit)
