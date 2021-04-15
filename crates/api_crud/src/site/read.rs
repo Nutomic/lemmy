@@ -47,9 +47,9 @@ impl PerformCrud for GetSite {
             description: None,
             icon: None,
             banner: None,
-            enable_downvotes: true,
-            open_registration: true,
-            enable_nsfw: true,
+            enable_downvotes: None,
+            open_registration: None,
+            enable_nsfw: None,
             auth: login_response.jwt,
           };
           create_site.perform(context, websocket_id).await?;

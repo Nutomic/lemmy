@@ -90,11 +90,10 @@ async fn get_feed_data(
 ) -> Result<HttpResponse, LemmyError> {
   let site_view = blocking(context.pool(), move |conn| SiteView::read(&conn)).await??;
 
-  let listing_type_ = listing_type.clone();
   let posts = blocking(context.pool(), move |conn| {
     PostQueryBuilder::create(&conn)
-      .listing_type(&listing_type_)
-      .sort(&sort_type)
+      .listing_type(listing_type)
+      .sort(sort_type)
       .list()
   })
   .await??;
@@ -174,8 +173,8 @@ fn get_feed_user(
   let person = Person::find_by_name(&conn, &user_name)?;
 
   let posts = PostQueryBuilder::create(&conn)
-    .listing_type(&ListingType::All)
-    .sort(sort_type)
+    .listing_type(ListingType::All)
+    .sort(*sort_type)
     .creator_id(person.id)
     .list()?;
 
@@ -200,8 +199,8 @@ fn get_feed_community(
   let community = Community::read_from_name(&conn, &community_name)?;
 
   let posts = PostQueryBuilder::create(&conn)
-    .listing_type(&ListingType::All)
-    .sort(sort_type)
+    .listing_type(ListingType::All)
+    .sort(*sort_type)
     .community_id(community.id)
     .list()?;
 
@@ -231,9 +230,9 @@ fn get_feed_front(
   let person_id = LocalUser::read(&conn, local_user_id)?.person_id;
 
   let posts = PostQueryBuilder::create(&conn)
-    .listing_type(&ListingType::Subscribed)
+    .listing_type(ListingType::Subscribed)
     .my_person_id(person_id)
-    .sort(sort_type)
+    .sort(*sort_type)
     .list()?;
 
   let items = create_post_items(posts)?;
@@ -262,13 +261,13 @@ fn get_feed_inbox(conn: &PgConnection, jwt: String) -> Result<ChannelBuilder, Le
   let replies = CommentQueryBuilder::create(&conn)
     .recipient_id(person_id)
     .my_person_id(person_id)
-    .sort(&sort)
+    .sort(sort)
     .list()?;
 
   let mentions = PersonMentionQueryBuilder::create(&conn)
     .recipient_id(person_id)
     .my_person_id(person_id)
-    .sort(&sort)
+    .sort(sort)
     .list()?;
 
   let items = create_reply_and_mention_items(replies, mentions)?;
